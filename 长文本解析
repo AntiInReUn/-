@@ -1,0 +1,46 @@
+import re
+
+long_text = """
+Variopartner SICAV
+529900LPCSV88817QH61
+1. TARENO GLOBAL WATER SOLUTIONS FUND
+LU2001709034
+LU2057889995
+LU2001709547
+2. TARENO FIXED INCOME FUND
+LU1299722972
+3. TARENO GLOBAL EQUITY FUND
+LU1299721909
+LU1299722113
+LU1299722030
+4. MIV GLOBAL MEDTECH FUND
+LU0329630999
+LU0329630130
+"""
+
+# 匹配基金名称和LEI
+name_pattern = re.compile(r'^(.+)\n(.+)\n', re.MULTILINE)
+name_match = name_pattern.search(long_text)
+name = name_match.group(1)
+lei = name_match.group(2)
+
+# 匹配基金子基金信息
+sub_fund_pattern = re.compile(r'(\d+)\. (.+)\n((?:LU\d{10}\n)+)', re.MULTILINE)
+sub_fund_matches = sub_fund_pattern.findall(long_text)
+sub_fund_list = []
+
+for sub_fund_match in sub_fund_matches:
+    sub_fund = {
+        'title': sub_fund_match[1],
+        'isin': sub_fund_match[2].strip().split('\n')
+    }
+    sub_fund_list.append(sub_fund)
+
+# 构建输出格式
+output = {
+    'name': name,
+    'lei': lei,
+    'sub_fund': sub_fund_list
+}
+
+print(output)
